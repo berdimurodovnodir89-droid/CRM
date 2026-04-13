@@ -76,3 +76,36 @@ def search_leads(query: str, db: Session = Depends(get_db)):
     leads = db.query(Lead).filter(Lead.name.ilike(f"%{query}%")).all()
 
     return leads
+
+
+@router.get("/kanban")
+def get_kanban(db: Session = Depends(get_db)):
+    leads = db.query(Lead).all()
+
+    return {
+        "new": [l for l in leads if l.status == "new"],
+        "contacted": [l for l in leads if l.status == "contacted"],
+        "client": [l for l in leads if l.status == "client"],
+        "lost": [l for l in leads if l.status == "lost"],
+    }
+
+
+@router.put("/{lead_id}/status")
+def update_status(lead_id: int, status: str, db: Session = Depends(get_db)):
+
+    allowed_status = ["new", "contacted", "client", "lost"]
+
+    if status not in allowed_status:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    lead.status = status
+
+    db.commit()
+    db.refresh(lead)
+
+    return lead
