@@ -1,0 +1,10 @@
+from sqlalchemy import Column, Integer, String
+from app.db.base import Base
+
+
+class PipelineStage(Base):
+    __tablename__ = "pipeline_stages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    position = Column(Integer, default=0)

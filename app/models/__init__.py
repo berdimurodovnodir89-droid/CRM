@@ -3,3 +3,4 @@ from .lead import Lead
 from .task import Task
 from .tag import Tag
 from .source import Source
+from .activity import Activity
